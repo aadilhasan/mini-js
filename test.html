@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test_app"> <p> my name is: {{name}}</p>
+    <h1> this works good mr. {{m_name}} </h1>
+    <button m-on:click="call_me" > test m-on:click </button>
+
+    <p m-for=" item in arr "> {{item}} </p>
+
+    <button  m-on:click="update_array"> view update </button>
+</div>
+
+
+<script src="./lex/lex.js"></script>
+<script src="./parser/parser.js"></script>
+<script src="./generator/generator.js"></script>
+<script src="./dist/mini-js.js"></script>
+<script>
+
+    var app = new Mini({
+
+        el: '#test_app',
+        data: {
+
+            name: 'rajat',
+            m_name: ' knight king',
+            arr: ['a', 'b', 'c'],
+            call_me: function () {
+
+//                alert(' hey m-on:click is working... yuppeeee ');
+                var $scope = this.$data;
+                console.log(' ths is data, ', arguments[arguments.length - 1], this.get('m_name'), this.$data.m_name, $scope.arr);
+                this.$data.m_name = 'fuck off';
+                $scope.arr.push('d');
+                console.log('  updated data: ', this.get('m_name'), $scope.m_name, $scope.arr);
+
+            },
+            update_array: function () {
+
+                var temp = this.get('arr');
+                temp.push('x');
+                console.log(' updating the array :: ', temp);
+
+                this.set('name', 'no name');
+                this.set('arr', temp);
+
+            }
+
+        }
+
+    });
+
+
+</script>
+
+</body>
+</html>
