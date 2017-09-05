@@ -251,13 +251,13 @@ function get_tag_attributes(tag_token, state){
 
 
 
-var str = `<p title="xk" id="this is id" m-on:click="test()">
-  <!-- thsi is comment test -->
-    <h1> Hello </h1> 
-  <span id="span_1"></span> 
-<span id="span_2"></span>
-<img src="tet.img" />
-      </p> 
-    <div id="div_test"></div>
-    <div></div>`;
-lexical_analysis(str);
+// var str = `<p title="xk" id="this is id" m-on:click="test()">
+//   <!-- thsi is comment test -->
+//     <h1> Hello </h1>
+//   <span id="span_1"></span>
+// <span id="span_2"></span>
+// <img src="tet.img" />
+//       </p>
+//     <div id="div_test"></div>
+//     <div></div>`;
+// lexical_analysis(str);
