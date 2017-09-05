@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="test_app">
+
+</div>
+
+<script src="./lex/lex.js"></script>
+<script src="./parser/parser.js"></script>
+<script src="./generator/generator.js"></script>
+<script src="./main/main.js"></script>
+<script src="./router/router.js"></script>
+<script>
+
+    var app = new Mini({
+
+        el: '#test_app',
+        template: `<div id="test_app">
+    <h1> This is page No {{page_no}} </h1>
+    <h1> I am  {{m_name}} </h1>
+    <button m-on:click="change_name" > Change Name </button>
+
+    <h3> m-for example ::  </h3>
+
+    <p m-for=" item in arr "> {{item}} </p>
+
+    <button  m-on:click="update_array"> view update </button>
+
+    <a href="#/page2"> open test page </a>
+
+    </div>`,
+        data: {
+
+            page_no: 0,
+            m_name: ' knight king',
+            arr: [1, 2, 3],
+            change_name: function () {
+
+                var temp_name = 'John Snow'
+                var name = this.get('m_name') == temp_name ? 'knight king' : temp_name;
+
+                this.set('m_name', name);
+
+            },
+            update_array: function () {
+
+                var temp = this.get('arr');
+                temp.push(Math.floor(Math.random()*10));
+                this.set('arr', temp);
+
+            }
+
+        }
+
+    });
+
+
+    var app2 = new Mini({
+        el: '#test_app',
+        template: `<div id="test_app">
+        <h1> This is :: {{page_name}}</h1>
+        <a href="#/page3" > go to third </a>
+        </div>`,
+        data: {
+
+            page_name: 'test page 2'
+
+        }
+    });
+
+    var app3 = new Mini({
+        el: '#test_app',
+        template: `<div id="test_app">
+        <h1> This is third page, {{txt}}</h1>
+        <a href="#/" > go to home </a>
+
+</div>`,
+        data: {
+
+            txt: 'is it ?'
+
+        }
+    });
+
+
+    MiniRouter.when('/', {
+        controller: app
+    }).when('/page2', {
+        controller: app2
+    }).when('/page3', {
+        controller: app3
+    }).done()
+
+
+</script>
+
+</body>
+</html>
