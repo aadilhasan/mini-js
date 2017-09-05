@@ -257,7 +257,7 @@ function Mini(options) {
 //=====================================
 
 
-    this.init();  // initialize the app.
+    //this.init();  // initialize the app.
 
 
 }
