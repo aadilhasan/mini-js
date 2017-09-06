@@ -133,7 +133,7 @@ var m = function (tag, attrs, meta, children) {
  * @param {Array|Object|String} classNames
  * @return {String} renderedClassNames
  */
-m.renderClass = function (classNames) {
+m.render_class = function (classNames) {
     if (typeof classNames === "string") {
         // If they are a string, no need for any more processing
         return classNames;
@@ -143,7 +143,7 @@ m.renderClass = function (classNames) {
     if (Array.isArray(classNames)) {
         // It's an array, so go through them all and generate a string
         for (var i = 0; i < classNames.length; i++) {
-            renderedClassNames += (m.renderClass(classNames[i])) + " ";
+            renderedClassNames += (m.render_class(classNames[i])) + " ";
         }
     } else if (typeof classNames === "object") {
         // It's an object, so to through and render them to a string if the corresponding condition is truthy
@@ -164,7 +164,7 @@ m.renderClass = function (classNames) {
  * @param {Array|Object|Number} iteratable
  * @param {Function} item
  */
-m.renderLoop = function (iteratable, item) {
+m.render_loop = function (iteratable, item) {
     var items = null;
 
     if (Array.isArray(iteratable)) {
@@ -198,7 +198,7 @@ m.renderLoop = function (iteratable, item) {
  * @param {Number} keyCode
  * @param {String} modifier
  */
-m.renderEventModifier = function (keyCode, modifier) {
+m.render_event_modifier = function (keyCode, modifier) {
     return keyCode === eventModifiers[modifier];
 }
 
