@@ -52,7 +52,7 @@ var default_metadata = function () {
 }
 
 // for special directives
-var emptyVNode = "m(\"#text\", " + (generate_meta(default_metadata())) + "\"\")",
+var empty_v_node = "m(\"#text\", " + (generate_meta(default_metadata())) + "\"\")",
     special_directives = {},
     directives = {};
 
@@ -75,6 +75,16 @@ var add_event_listener_code_to_v_node = function(name, handler, vnode) {
 }
 
 
+var event_modifiers_code = {
+    stop: 'event.stopPropagation();',
+    prevent: 'event.preventDefault();',
+    ctrl: 'if(event.ctrlKey === false) {return null;};',
+    shift: 'if(event.shiftKey === false) {return null;};',
+    alt: 'if(event.altKey === false) {return null;};',
+    enter: 'if(event.keyCode !== 13) {return null;};'
+}
+
+
 
 // ================ inbuilt directives ==============>
 
@@ -83,7 +93,7 @@ special_directives["m-if"] = {
     after_generate: function (prop, code, vnode, state) {
         var value = prop.value;
         compile_template_expression(value, state.dependencies);
-        return (value + " ? " + code + " : " + emptyVNode);
+        return (value + " ? " + code + " : " + empty_v_node);
     }
 }
 
@@ -146,7 +156,7 @@ special_directives["m-on"] = {
         // Generate any modifiers
         var modifiers = "";
         for (var i = 0; i < rawModifiers.length; i++) {
-            var eventModifierCode = eventModifiersCode[rawModifiers[i]];
+            var eventModifierCode = event_modifiers_code[rawModifiers[i]];
             if (eventModifierCode === undefined) {
                 modifiers += "if(m.renderEventModifier(event.keyCode, \"" + (rawModifiers[i]) + "\") === false) {return null;};"
             } else {

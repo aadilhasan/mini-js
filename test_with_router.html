@@ -31,12 +31,21 @@
 
     <button  m-on:click="update_array"> view update </button>
 
-    <a href="#/page2"> open test page </a>
+    <h3> m-model example  </h3>
+
+    <p> My favourite fruit is :: {{fruit_name}} </p>
+
+    <input placeholder="enter your favourite fruit's name "  m-model="fruit_name"/>
+    <br>
+    <br>
+
+    <a href="#/page2"> open next page using routing </a>
 
     </div>`,
         data: {
 
             page_no: 0,
+            fruit_name: 'apple',
             m_name: ' knight king',
             arr: [1, 2, 3],
             change_name: function () {
