@@ -14,6 +14,7 @@
 <script src="./parser/parser.js"></script>
 <script src="./generator/generator.js"></script>
 <script src="./main/main.js"></script>
+<script src="reactivity/reactive.js"></script>
 <script src="./router/router.js"></script>
 <script>
 
@@ -21,49 +22,69 @@
 
         el: '#test_app',
         template: `<div id="test_app">
+
+    <p> {{m_name}}</p>
+    <input m-model="m_name" />
+
     <h1> This is page No {{page_no}} </h1>
     <h1> I am  {{m_name}} </h1>
-    <button m-on:click="change_name" > Change Name </button>
+    <button m-on:click="change_name()" > Change Name </button>
 
-    <h3> m-for example ::  </h3>
-
-    <p m-for=" item in arr "> {{item}} </p>
-
-    <button  m-on:click="update_array"> view update </button>
-
-    <h3> m-model example  </h3>
-
-    <p> My favourite fruit is :: {{fruit_name}} </p>
-
-    <input placeholder="enter your favourite fruit's name "  m-model="fruit_name"/>
+    <p m-for=" item in arr "> {{item.a}} </p>
     <br>
     <br>
+    <p m-for=" item in obj_test "> {{item}} </p>
 
-    <a href="#/page2"> open next page using routing </a>
+    <button  m-on:click="update_array()"> view update </button>
+    <button  m-on:click="test_obj()"> is update </button>
 
-    </div>`,
+    <a href="#/page2"> open test page </a>
+
+
+</div>`,
         data: {
 
             page_no: 0,
-            fruit_name: 'apple',
-            m_name: ' knight king',
-            arr: [1, 2, 3],
-            change_name: function () {
-
-                var temp_name = 'John Snow'
-                var name = this.get('m_name') == temp_name ? 'knight king' : temp_name;
-
-                this.set('m_name', name);
-
+            obj_test: {
+                t: 'test test_1',
+                s: 'sss'
             },
+            m_name: ' knight king',
+            arr: [{
+                a: 'a'
+            },
+                {
+                    a: 'b'
+                },
+                {
+                    a: 'v'
+                }]
+
+        },
+        methods: {
+
+
             update_array: function () {
 
                 var temp = this.get('arr');
-                temp.push(Math.floor(Math.random()*10));
-                this.set('arr', temp);
+                console.log(' temp is ', this, temp);
+                this.set('obj_test.test_new', (Math.floor(Math.random() * 10)));
+//                this.arr[0] = {a: 'fff'};
+                console.log(' after :: ', this.get('obj_test'));
+//                this.set('arr',temp);
+
+            },
+            test_obj: function () {
+
+                this.obj_test.test_new = ' aadil '+(Math.floor(Math.random() * 10));
+                this.m_name = ' aadil '+(Math.floor(Math.random() * 10)+10);
+
+            },
+            change_name: function () {
+
+                this.set('m_name', 'John Snow');
 
             }
-
         }
 
     });

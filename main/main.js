@@ -15,13 +15,18 @@ var define_property = function (obj, prop, value, def) {
 }
 
 var init_methods = function (instance, methods) {
-    var data = this.$data;
+    var data = instance.$data;
 
     function init_method(name, method) {
 
         data[name] = function () {
 
-            return method.apply(instance, arguments);
+            // attache data getter and setter to the instance so they can b
+            instance.$data.get = instance.get.bind(instance);
+            instance.$data.set = instance.set.bind(instance);
+
+            // pass data to method so they can
+            return method.apply(instance.$data, arguments);
 
         }
 
@@ -245,6 +250,7 @@ function Mini(options) {
 
     }
 
+    this.make_reactive(this.$data); // make objects reactive
     this.$events = {};
     this.$dom = {};
     this.$observer = new Observer(this);
@@ -728,6 +734,10 @@ var resolve_key_path = function (instance, data, key, value) {
     }
     //console.log(data[path[i]]);
     data[path[i]] = value;
+
+    // new key may be getting added to the object so make the new key reactive
+    instance.make_reactive(data, value);
+
     return path[0];
 }
 
