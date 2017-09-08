@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mini-js@1.0.1/build/mini.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title> Mini JS two way binding example </title>
+</head>
+<body>
+  
+  <div id="app1">
+    
+    <h2> Mini.JS Two way binding example </h2>
+    <br>
+    
+    <h3> {{txt}} : {{fruit_name}} </h3>
+    <br>
+    
+    Chnage fruit name here  <input m-model="fruit_name" />
+    
+    
+  </div>
+
+<script id="jsbin-javascript">
+var app = new Mini({
+  
+  el: '#app1',
+  data: {
+    
+    txt: 'my favourite fruit',
+    fruit_name : 'mango'
+    
+  }
+  
+})
+</script>
+
+
+
+<script id="jsbin-source-javascript" type="text/javascript">var app = new Mini({
+  
+  el: '#app1',
+  data: {
+    
+    txt: 'my favourite fruit',
+    fruit_name : 'mango'
+    
+  }
+  
+})</script></body>
+</html>
