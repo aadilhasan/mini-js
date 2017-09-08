@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
+    <script src="build/mini.min.js"></script>
 </head>
 <body>
 
@@ -16,11 +18,11 @@
 </div>
 
 
-<script src="./lex/lex.js"></script>
-<script src="./parser/parser.js"></script>
-<script src="./generator/generator.js"></script>
-<script src="main/main.js"></script>
-<script src="reactivity/reactive.js"></script>
+<!--<script src="./lex/lex.js"></script>-->
+<!--<script src="./parser/parser.js"></script>-->
+<!--<script src="./generator/generator.js"></script>-->
+<!--<script src="main/main.js"></script>-->
+<!--<script src="reactivity/reactive.js"></script>-->
 <script>
 
     var app = new Mini({
@@ -36,7 +38,7 @@
 //                alert(' hey m-on:click is working... yuppeeee ');
                 var $scope = this.$data;
                 console.log(' ths is data, ', arguments[arguments.length - 1], this.get('m_name'), this.$data.m_name, $scope.arr);
-                this.$data.m_name = 'fuck off';
+                this.$data.m_name = 'you are no king';
                 $scope.arr.push('d');
                 console.log('  updated data: ', this.get('m_name'), $scope.m_name, $scope.arr);
 

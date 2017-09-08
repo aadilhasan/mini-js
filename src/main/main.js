@@ -1,4 +1,4 @@
-
+var __router__ = false;
 
 var define_property = function (obj, prop, value, def) {
 
@@ -264,6 +264,11 @@ function Mini(options) {
 
 
     //this.init();  // initialize the app.
+    console.log(' checking for router :: ', __router__);
+    if(!__router__){
+        console.log(' no router found');
+        this.init();
+    }
 
 
 }

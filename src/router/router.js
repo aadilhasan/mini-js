@@ -79,12 +79,11 @@ var MiniRouter = (function() {
     }
 
     var done = function () {
-        console.log('routes :: ', routes);
+        console.log('router running :: ', routes, __router__);
+        __router__ = true;
         init_router();
 
     }
-
-    console.log(' router is runnign');
     var router = {
         when: when,
         done: done
