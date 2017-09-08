@@ -27,6 +27,7 @@ Mini needs an element in which it can mount the template or it which it can oper
 <div id='test_app'>
   
   <p> {{best_fruit}} is the best fruit in the world </p>
+  <button m-on:click="change_best_fruit()" > change best fruit in the world <button>
 
 <div>
 
@@ -41,14 +42,16 @@ var app = new Mini({
     el: '#test_app',
     data: {
       
-      best_fruit: 'mango'
+      best_fruit: 'mango',
+      fruits = ['apple', 'banana', 'berry', 'orange', 'cherry']
       
     },
     methods: {
     
-      change_fruit_name: function(){
+      change_best_fruit: function(){
       
-        this.best_fruit: 'apple'
+        var index = Math.ceil(Math.random()*5);
+        this.best_fruit: this.fruits[index];
       
       }
     
