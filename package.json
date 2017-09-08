@@ -1,0 +1,45 @@
+{
+  "name": "mini-js",
+  "version": "1.0.0",
+  "description": "Mini Js is a Javascript library/framework which is inspired by vue.js, it supports two way data binding, virtual dom, directives, routing etc.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aadilhasan/mini-js.git"
+  },
+  "keywords": [
+    "js",
+    "framework",
+    "mini",
+    "js",
+    "small",
+    "js",
+    "framework",
+    "javascript",
+    "javascript",
+    "framwork",
+    "mini",
+    "javascrpt",
+    "framework",
+    "mini",
+    "js",
+    "framework",
+    "js",
+    "library",
+    "js",
+    "framework"
+  ],
+  "author": "aadil hasan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aadilhasan/mini-js/issues"
+  },
+  "homepage": "https://github.com/aadilhasan/mini-js#readme",
+  "dependencies": {
+    "node-minify": "^2.3.0"
+  }
+}
