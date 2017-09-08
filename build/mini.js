@@ -1,387 +1,3 @@
-var lexical_analysis = function(template){
-
-    var state = {
-        str: template,
-        tokens : [],
-        current : 0
-    };
-
-    lex_state(state);
-    console.log(' lex : ', state.tokens);
-    return state.tokens;
-
-}
-
-
-function lex_state(state){
-
-    var str = state.str,
-        len = state.str.length;
-
-    while(state.current < len){
-
-        // it is text
-        if(str.charAt(state.current) !== "<"){
-
-            get_text(state);
-            continue;
-
-        }
-
-        // it is comment
-        if(str.substr(state.current, 4) == "<!--"){
-
-            get_comment(state);
-            continue;
-        }
-
-        // its a tag
-        get_tag(state);
-    }
-}
-
-
-function get_text(state){
-    var str = state.str,
-        len = state.str.length,
-        current = state.current;
-
-    var tag_or_comment_start_RE = /<\/?(?:[A-Za-z]+\w*)|<!--/ ;
-
-    var end_of_txt = str.substring(current).search(tag_or_comment_start_RE);
-
-    if(end_of_txt == -1){
-
-        state.tokens.push({
-            type: 'text',
-            value: str.slice(current)
-        });
-
-        state.current = len;
-        return;
-    }else if(end_of_txt !== 0){
-
-        end_of_txt += current;
-        state.tokens.push({
-            type: 'text',
-            value: str.slice(current, end_of_txt)
-        });
-
-        state.current = end_of_txt;
-
-    }
-
-}
-
-
-function get_comment(state){
-
-    var current = state.current+4,  // skip "<!--"
-        str = state.str,
-        len = state.str.length;
-
-    var end_of_comment = str.indexOf("-->", current);
-
-    if(end_of_comment == -1){
-
-        state.tokens.push({
-            type: 'comment',
-            value: str.slice(current)
-        });
-
-        state.current = len;
-
-    }else{
-
-        state.tokens.push({
-            type: 'comment',
-            value: str.slice(current, end_of_comment)
-        });
-
-        state.current = end_of_comment+3;
-
-    }
-
-}
-
-
-
-function get_tag(state){
-
-    var str = state.str,
-        len = state.str.length;
-
-    var is_tag_closing_started = str.charAt(state.current+1) == "/";
-    state.current += is_tag_closing_started ? 2 : 1;
-
-    var tag_token = get_tag_name(state);
-    get_tag_attributes(tag_token, state);
-
-    var is_tag_self_closing = str.charAt(state.current) == "/";
-    state.current += is_tag_self_closing ? 2 : 1;
-
-    if(is_tag_closing_started){
-        tag_token.tag_closing = true;
-    }
-
-    if(is_tag_self_closing){
-        tag_token.tag_self_closing = true;
-    }
-
-    console.log('done with get tag ');
-
-}
-
-function get_tag_name(state){
-
-    var current = state.current, len = state.str.length, str = state.str, tag_name = '';
-    while(current < len){
-        var char = str.charAt(current);
-        if(char == "/" || char == " " || char == ">"){
-            break;
-        }else{
-            tag_name+=char;
-        }
-        current++;
-    }
-
-    state.current = current;
-    var tag_token = {
-        type : 'tag',
-        value : tag_name
-    };
-    state.tokens.push(tag_token);
-    return tag_token;
-
-}
-
-
-
-function get_tag_attributes(tag_token, state){
-
-    var str = state.str,
-        len = state.str.length,
-        current = state.current,
-        char = str.charAt(current),
-        nextChar = str.charAt(current+1),
-        attributes = {};
-
-    function increment(){
-        current++;
-        char = str.charAt(current);
-        nextChar = str.charAt(current+1);
-    }
-
-
-    while(current < len){
-
-        if(char == ">" || (char == "/" && nextChar == ">")){
-            break;
-        }
-
-        if(char == " "){
-            increment();
-            continue;
-        }
-        var attribute_name = "", no_value_in_tag = false;
-
-        while(current < len && char !== "="){
-            if(char == " " || (char == "/" && nextChar == ">")){
-                no_value_in_tag = true;
-                break;
-            }
-            attribute_name+=char;
-            increment();
-        }
-
-        // skip "="
-        increment();
-
-        var attribute_value = {
-            name : attribute_name,
-            value : '',
-            meta : {}
-        };
-
-        console.log(attribute_name, no_value_in_tag, char);
-
-        if(no_value_in_tag){
-            attributes[attribute_name] = attribute_value;
-            continue;
-        }
-
-        var quote_type = "";
-        if( char == "'" || char == "\""){
-
-            quote_type = char;
-            increment();
-
-        }
-
-
-        while( current < len && char !== quote_type){
-
-            attribute_value.value += char;
-            increment();
-
-        }
-
-        console.log(' val : ', attribute_value.value, quote_type);
-
-        //skip quote end
-        increment();
-
-        var dot_index = attribute_name.indexOf(":");
-        if(dot_index !== -1){
-            var temp = attribute_name.split(":");
-            attribute_value.name = temp[0];
-            attribute_value.meta.args = temp[1];
-        }
-        attributes[attribute_name] = attribute_value;
-    }
-
-    console.log(' att ', attributes);
-
-    state.current = current;
-    tag_token.attributes = attributes;
-
-}
-
-
-
-
-
-// var str = `<p title="xk" id="this is id" m-on:click="test()">
-//   <!-- thsi is comment test -->
-//     <h1> Hello </h1>
-//   <span id="span_1"></span>
-// <span id="span_2"></span>
-// <img src="tet.img" />
-//       </p>
-//     <div id="div_test"></div>
-//     <div></div>`;
-// lexical_analysis(str);
-
-function parser(tokens) {
-
-    var root = {
-
-        type : 'root',
-        children: []
-
-    }
-
-    var state = {
-        current: 0,
-        tokens: tokens
-    }
-
-    while(state.current < tokens.length){
-
-        var child = getChild(state);
-        if(child){
-            root.children.push(child);
-        }
-
-    }
-
-    console.log(' root is  :: ', root);
-    return root;
-
-}
-
-var SELF_CLOSING_ELEMENTS = ["area","base","br","command","embed","hr","img","input","keygen","link","meta","param","source","track","wbr"];
-var SVG_ELEMENTS = ["svg","animate","circle","clippath","cursor","defs","desc","ellipse","filter","font-face","foreignObject","g","glyph","image","line","marker","mask","missing-glyph","path","pattern","polygon","polyline","rect","switch","symbol","text","textpath","tspan","use","view"];
-
-function createNode(node_type, props, children) {
-
-    return {
-        type: node_type,
-        props: props,
-        children: children
-    }
-
-}
-
-
-function getChild(state) {
-
-    var token = state.tokens[state.current];
-    var next_token = state.tokens[state.current+1];
-    var prev_token = state.tokens[state.current-1];
-
-    var move = function(num) {
-
-        state.current += (num == undefined ? 1 : num);
-        token = state.tokens[state.current];
-        next_token = state.tokens[state.current+1];
-        prev_token = state.tokens[state.current-1];
-
-    }
-
-    if(token.type == 'text'){
-        move();
-        return prev_token.value;
-    }
-
-    if(token.type == 'comment'){
-        move();
-        return null;
-    }
-
-    if(token.type == 'tag'){
-        var tag_type = token.value,
-            tag_self_closing = token.tag_self_closing,
-            tag_closing = token.tag_closing;
-
-        var is_svg_element = SVG_ELEMENTS.indexOf(tag_type) !== -1;
-        var is_self_closing_element = SELF_CLOSING_ELEMENTS.indexOf(tag_type) !== -1 || tag_self_closing == true;
-        var node = createNode(tag_type, token.attributes, []);
-
-        move();
-
-        if(is_svg_element){
-            node.is_svg = true;
-        }
-
-        if(is_self_closing_element){
-            // element is self closing so it will not have any children so no need to process further;
-            return node
-
-        }else if(tag_closing){
-
-            console.error(' Cannot find a closing tag for element  : ', node.type);
-            return null;
-
-        }else if(token !== undefined){
-
-            var current  = state.current;
-
-            while(token.type !== 'tag' || ((token.type == 'tag') && ((token.tag_self_closing == undefined && token.tag_closing  == undefined) || (token.value !== tag_type))) ){
-
-                var child = getChild(state);
-                if(child !== null){
-                    node.children.push(child);
-                }
-
-                move(0);
-
-                if(token == undefined){
-                    console.error(`The element "${node.type}" was left unclosed`);
-                    break;
-                }
-
-            }
-            move();
-
-
-        }
-
-        return node;
-    }
-    move();
-    return;
-}
 
 
 // var event_listeners = null;
@@ -1114,6 +730,269 @@ var generator = function (tree) {
 
 };
 
+var lexical_analysis = function(template){
+
+    var state = {
+        str: template,
+        tokens : [],
+        current : 0
+    };
+
+    lex_state(state);
+    console.log(' lex : ', state.tokens);
+    return state.tokens;
+
+}
+
+
+function lex_state(state){
+
+    var str = state.str,
+        len = state.str.length;
+
+    while(state.current < len){
+
+        // it is text
+        if(str.charAt(state.current) !== "<"){
+
+            get_text(state);
+            continue;
+
+        }
+
+        // it is comment
+        if(str.substr(state.current, 4) == "<!--"){
+
+            get_comment(state);
+            continue;
+        }
+
+        // its a tag
+        get_tag(state);
+    }
+}
+
+
+function get_text(state){
+    var str = state.str,
+        len = state.str.length,
+        current = state.current;
+
+    var tag_or_comment_start_RE = /<\/?(?:[A-Za-z]+\w*)|<!--/ ;
+
+    var end_of_txt = str.substring(current).search(tag_or_comment_start_RE);
+
+    if(end_of_txt == -1){
+
+        state.tokens.push({
+            type: 'text',
+            value: str.slice(current)
+        });
+
+        state.current = len;
+        return;
+    }else if(end_of_txt !== 0){
+
+        end_of_txt += current;
+        state.tokens.push({
+            type: 'text',
+            value: str.slice(current, end_of_txt)
+        });
+
+        state.current = end_of_txt;
+
+    }
+
+}
+
+
+function get_comment(state){
+
+    var current = state.current+4,  // skip "<!--"
+        str = state.str,
+        len = state.str.length;
+
+    var end_of_comment = str.indexOf("-->", current);
+
+    if(end_of_comment == -1){
+
+        state.tokens.push({
+            type: 'comment',
+            value: str.slice(current)
+        });
+
+        state.current = len;
+
+    }else{
+
+        state.tokens.push({
+            type: 'comment',
+            value: str.slice(current, end_of_comment)
+        });
+
+        state.current = end_of_comment+3;
+
+    }
+
+}
+
+
+
+function get_tag(state){
+
+    var str = state.str,
+        len = state.str.length;
+
+    var is_tag_closing_started = str.charAt(state.current+1) == "/";
+    state.current += is_tag_closing_started ? 2 : 1;
+
+    var tag_token = get_tag_name(state);
+    get_tag_attributes(tag_token, state);
+
+    var is_tag_self_closing = str.charAt(state.current) == "/";
+    state.current += is_tag_self_closing ? 2 : 1;
+
+    if(is_tag_closing_started){
+        tag_token.tag_closing = true;
+    }
+
+    if(is_tag_self_closing){
+        tag_token.tag_self_closing = true;
+    }
+
+    console.log('done with get tag ');
+
+}
+
+function get_tag_name(state){
+
+    var current = state.current, len = state.str.length, str = state.str, tag_name = '';
+    while(current < len){
+        var char = str.charAt(current);
+        if(char == "/" || char == " " || char == ">"){
+            break;
+        }else{
+            tag_name+=char;
+        }
+        current++;
+    }
+
+    state.current = current;
+    var tag_token = {
+        type : 'tag',
+        value : tag_name
+    };
+    state.tokens.push(tag_token);
+    return tag_token;
+
+}
+
+
+
+function get_tag_attributes(tag_token, state){
+
+    var str = state.str,
+        len = state.str.length,
+        current = state.current,
+        char = str.charAt(current),
+        nextChar = str.charAt(current+1),
+        attributes = {};
+
+    function increment(){
+        current++;
+        char = str.charAt(current);
+        nextChar = str.charAt(current+1);
+    }
+
+
+    while(current < len){
+
+        if(char == ">" || (char == "/" && nextChar == ">")){
+            break;
+        }
+
+        if(char == " "){
+            increment();
+            continue;
+        }
+        var attribute_name = "", no_value_in_tag = false;
+
+        while(current < len && char !== "="){
+            if(char == " " || (char == "/" && nextChar == ">")){
+                no_value_in_tag = true;
+                break;
+            }
+            attribute_name+=char;
+            increment();
+        }
+
+        // skip "="
+        increment();
+
+        var attribute_value = {
+            name : attribute_name,
+            value : '',
+            meta : {}
+        };
+
+        console.log(attribute_name, no_value_in_tag, char);
+
+        if(no_value_in_tag){
+            attributes[attribute_name] = attribute_value;
+            continue;
+        }
+
+        var quote_type = "";
+        if( char == "'" || char == "\""){
+
+            quote_type = char;
+            increment();
+
+        }
+
+
+        while( current < len && char !== quote_type){
+
+            attribute_value.value += char;
+            increment();
+
+        }
+
+        console.log(' val : ', attribute_value.value, quote_type);
+
+        //skip quote end
+        increment();
+
+        var dot_index = attribute_name.indexOf(":");
+        if(dot_index !== -1){
+            var temp = attribute_name.split(":");
+            attribute_value.name = temp[0];
+            attribute_value.meta.args = temp[1];
+        }
+        attributes[attribute_name] = attribute_value;
+    }
+
+    console.log(' att ', attributes);
+
+    state.current = current;
+    tag_token.attributes = attributes;
+
+}
+
+
+
+
+
+// var str = `<p title="xk" id="this is id" m-on:click="test()">
+//   <!-- thsi is comment test -->
+//     <h1> Hello </h1>
+//   <span id="span_1"></span>
+// <span id="span_2"></span>
+// <img src="tet.img" />
+//       </p>
+//     <div id="div_test"></div>
+//     <div></div>`;
+// lexical_analysis(str);
 
 
 var define_property = function (obj, prop, value, def) {
@@ -2073,6 +1952,191 @@ Mini.prototype.init = function () {
 
 
 
+
+function parser(tokens) {
+
+    var root = {
+
+        type : 'root',
+        children: []
+
+    }
+
+    var state = {
+        current: 0,
+        tokens: tokens
+    }
+
+    while(state.current < tokens.length){
+
+        var child = getChild(state);
+        if(child){
+            root.children.push(child);
+        }
+
+    }
+
+    console.log(' root is  :: ', root);
+    return root;
+
+}
+
+var SELF_CLOSING_ELEMENTS = ["area","base","br","command","embed","hr","img","input","keygen","link","meta","param","source","track","wbr"];
+var SVG_ELEMENTS = ["svg","animate","circle","clippath","cursor","defs","desc","ellipse","filter","font-face","foreignObject","g","glyph","image","line","marker","mask","missing-glyph","path","pattern","polygon","polyline","rect","switch","symbol","text","textpath","tspan","use","view"];
+
+function createNode(node_type, props, children) {
+
+    return {
+        type: node_type,
+        props: props,
+        children: children
+    }
+
+}
+
+
+function getChild(state) {
+
+    var token = state.tokens[state.current];
+    var next_token = state.tokens[state.current+1];
+    var prev_token = state.tokens[state.current-1];
+
+    var move = function(num) {
+
+        state.current += (num == undefined ? 1 : num);
+        token = state.tokens[state.current];
+        next_token = state.tokens[state.current+1];
+        prev_token = state.tokens[state.current-1];
+
+    }
+
+    if(token.type == 'text'){
+        move();
+        return prev_token.value;
+    }
+
+    if(token.type == 'comment'){
+        move();
+        return null;
+    }
+
+    if(token.type == 'tag'){
+        var tag_type = token.value,
+            tag_self_closing = token.tag_self_closing,
+            tag_closing = token.tag_closing;
+
+        var is_svg_element = SVG_ELEMENTS.indexOf(tag_type) !== -1;
+        var is_self_closing_element = SELF_CLOSING_ELEMENTS.indexOf(tag_type) !== -1 || tag_self_closing == true;
+        var node = createNode(tag_type, token.attributes, []);
+
+        move();
+
+        if(is_svg_element){
+            node.is_svg = true;
+        }
+
+        if(is_self_closing_element){
+            // element is self closing so it will not have any children so no need to process further;
+            return node
+
+        }else if(tag_closing){
+
+            console.error(' Cannot find a closing tag for element  : ', node.type);
+            return null;
+
+        }else if(token !== undefined){
+
+            var current  = state.current;
+
+            while(token.type !== 'tag' || ((token.type == 'tag') && ((token.tag_self_closing == undefined && token.tag_closing  == undefined) || (token.value !== tag_type))) ){
+
+                var child = getChild(state);
+                if(child !== null){
+                    node.children.push(child);
+                }
+
+                move(0);
+
+                if(token == undefined){
+                    console.error(`The element "${node.type}" was left unclosed`);
+                    break;
+                }
+
+            }
+            move();
+
+
+        }
+
+        return node;
+    }
+    move();
+    return;
+}
+/**
+ * Created by developer on 9/8/17.
+ */
+function set_object_setter_getter(obj, key, instance){
+
+    var property = Object.getOwnPropertyDescriptor(obj, key);
+
+    if(property && property.configurable === false){
+        return;
+    }
+
+    var val = obj[key];
+
+    Object.defineProperty(obj, key, {
+        enumerable: true,
+        configurable: true,
+        get: function(){
+
+            return val
+
+        },
+        set: function(new_value){
+
+            val = new_value;
+            // console.log(' setting : ', new_value, ' new arr: ', val, instance.$data);
+            queue_build(instance);
+
+
+        }
+
+    });
+
+}
+
+Mini.prototype.make_reactive = function(obj){
+
+    console.log(' making reactive ', obj);
+    var keys = Object.keys(obj), key, temp_obj;
+
+    for(var i=0; i < keys.length; i++){
+
+        key = keys[i];
+        temp_obj = obj[key];
+
+        if(typeof temp_obj == 'object'){
+
+            this.make_reactive(temp_obj);
+
+
+        }else if(Array.isArray(temp_obj)){
+
+            for(var j=0; j < temp_obj.length; j++){
+
+                this.make_reactive(temp_obj[i]);
+
+            }
+
+        }
+
+        set_object_setter_getter(obj, key, this);
+
+    }
+
+}
 var MiniRouter = (function() {
 
     var routes = {};
