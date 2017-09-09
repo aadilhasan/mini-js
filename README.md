@@ -43,7 +43,7 @@ var app = new Mini({
     data: {
       
       best_fruit: 'mango',
-      fruits = ['apple', 'banana', 'berry', 'orange', 'cherry']
+      fruits: ['apple', 'banana', 'berry', 'orange', 'cherry']
       
     },
     methods: {
