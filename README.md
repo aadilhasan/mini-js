@@ -51,7 +51,7 @@ var app = new Mini({
       change_best_fruit: function(){
       
         var index = Math.ceil(Math.random()*5);
-        this.best_fruit: this.fruits[index];
+        this.best_fruit = this.fruits[index];
       
       }
     
