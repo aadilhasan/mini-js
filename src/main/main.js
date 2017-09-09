@@ -343,14 +343,14 @@ var diff_props = function (node, node_props, v_node, props) { // old_node, old_p
 
     }
 
-    var v_node_directives = null; // execute directive
+    var v_node_directives = null; // execute directives
 
     if ((v_node_directives = props.directives) !== undefined) {
 
         for (var directive in v_node_directives) {
 
             var directive_fn = null;
-            if ((directive_fn = v_node_directives[directive]) !== undefined) {
+            if ((directive_fn = directives[directive]) !== undefined) {
 
                 directive_fn(node, v_node_directives[directive], v_node);
 
@@ -916,6 +916,10 @@ Mini.compile = function (template) {
     var ast = parser(tokens);
     return generator(ast);
 
+}
+
+Mini.directive = function (name, action) {
+    directives["m-" + name] = action;
 }
 
 Mini.prototype.mount = function (el) {

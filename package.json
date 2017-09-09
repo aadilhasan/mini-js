@@ -1,6 +1,6 @@
 {
   "name": "mini-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mini Js is a Javascript library/framework which is inspired by vue.js, it supports two way data binding, virtual dom, directives, routing etc.",
   "main": "index.js",
   "scripts": {

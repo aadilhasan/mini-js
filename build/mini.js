@@ -1913,6 +1913,10 @@ Mini.compile = function (template) {
 
 }
 
+Mini.directive = function (name, action) {
+    directives["m-" + name] = action;
+}
+
 Mini.prototype.mount = function (el) {
 
     this.$el = typeof el == 'string' ? document.querySelector(el) : el; // get dom element

@@ -17,7 +17,7 @@
 <!--<script src="reactivity/reactive.js"></script>-->
 <!--<script src="./router/router.js"></script>-->
 
-<script src="build/mini.min.js"></script>
+<script src="build/mini.js"></script>
 <script>
 
     var app = new Mini({
@@ -27,6 +27,12 @@
 
     <p> {{m_name}}</p>
     <input m-model="m_name" />
+
+    <h1> Its visible if hide_me is false  <span m-if="!hide_me">  ## -- ## -- ## -- ## -- ## -- ##</span></h1>
+    <!--<h1 m-show="hide_me"> I am visible if hide_me is false </h1>-->
+    <br>
+    <br>
+    <button m-on:click="toggle_hide_me"> toggle hide_me </button>
 
     <h1> This is page No {{page_no}} </h1>
     <h1> I am  {{m_name}} </h1>
@@ -60,7 +66,8 @@
                 },
                 {
                     a: 'v'
-                }]
+                }],
+            hide_me: false
 
         },
         methods: {
@@ -85,6 +92,11 @@
             change_name: function () {
 
                 this.set('m_name', 'John Snow');
+
+            },
+            toggle_hide_me: function () {
+
+                this.hide_me = !this.hide_me;
 
             }
         }
