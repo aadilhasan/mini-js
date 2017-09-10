@@ -8,7 +8,7 @@ Mini JS has features of modern JS frameworks, here are some of the features -
 
 * **Virtual Dom**- A lightning fast virtual dom which with a good diff algorithm for fast partial rerender.
 * **Two way data binding**- As soon as data gets change it will reflect in the ui.
-* **Native Directives**- such as m-on, m-for, m-if, m-show etc.
+* **Native Directives**- such as m-on ([example](https://jsfiddle.net/aadilhasan07/2kfns190/1/)), m-for, m-if, m-show etc.
 * **Router**- for navigation between pages(routing)
 
 ## installation
