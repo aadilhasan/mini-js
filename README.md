@@ -1,6 +1,7 @@
 # mini-js
 
 It is javascript framework for frontend development heighly inspired by Vue JS. I am developing it just to learn and understand JS and its framework more, it is not meant to be used in production.
+[Check out a demo TODO app here](https://jsfiddle.net/aadilhasan07/7a4d56qo/19/)
 
 ## features
 
